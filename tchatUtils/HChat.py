@@ -29,13 +29,16 @@ from time import time as pingTime
 
 try:
     import websocket
+    getattr(websocket, 'create_connection')
+except AttributeError:
+    print("Error: you must uninstall websocket to use websocket-client due to naming conflicts")
 except ImportError:
     print("You must have websocket-client installed to use tchat")
     exit(1)
 
 class HChat:
 
-    def __init__(self, nick, channel="alextest"):
+    def __init__(self, nick, channel):
         """Connects to a channel on https://hack.chat.
         Keyword arguments:
         nick -- <str>; the nickname to use upon joining the channel
@@ -45,6 +48,7 @@ class HChat:
         self.channel = channel
         self.online_users = []
         self.on_message = []
+        self.user_message = []
 
     def send_message(self, msg):
         """Sends a message on the channel."""
@@ -69,8 +73,9 @@ class HChat:
             self.pingThread.start()
             print("Success!")
         except Exception as err:
-            print("Failure")
+            print("Failure!")
             print(err)
+            exit(1)
 
 
 
@@ -80,33 +85,16 @@ class HChat:
                 result = json.loads(self.ws.recv())
             except  websocket._exceptions.WebSocketConnectionClosedException:
                 exit(0)
-            tstamp = result["time"]
-            hours = tstamp // 3600 % 24
-            minutes = tstamp // 60 % 60
-            if minutes < 10:
-                minutes = "0" + str(minutes)
-            time = "[" + str(hours) + ":" + str(minutes) + "] "
             if result["cmd"] == "chat" and not result["nick"] == self.nick:
-                print(time + result["nick"] + ": " + result["text"])
+                self.user_message.append(result["nick"])
+                self.on_message.append(result["text"])
             elif result["cmd"] == "onlineAdd":
                 self.online_users.append(result["nick"])
-                print()
-                print(time + "User joined: " + result["nick"])
             elif result["cmd"] == "onlineRemove":
                 self.online_users.remove(result["nick"])
-                print()
-                print(time + "User left: " + result["nick"])
             elif result["cmd"] == "onlineSet":
-                print("Users in room:", end=" ")
                 for nick in result["nicks"]:
                     self.online_users.append(nick)
-                for nick in self.online_users:
-                    if not nick == self.online_users[-1]:
-                        print(nick + ",", end=" ")
-                    else:
-                        print(nick, end=" ")
-                print()
-                print()
 
     def pingThread(self):
         """Retains the websocket connection."""

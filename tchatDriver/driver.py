@@ -24,7 +24,11 @@
 import argparse
 import threading
 
-import hackchat.HChat as chat
+from curses import wrapper
+
+from tchat import interface
+
+
 
 currentVersion="0.0.1"
 
@@ -41,10 +45,6 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
-def getUserInput(nick, chatter):
-    while chatter.ws.connected:
-        message = input()
-        chatter.send_message(message)
 
 def main():
     args = parseArgs()
@@ -54,15 +54,19 @@ def main():
         print("You must specify a room name to join")
         exit(1)
     else:
-        chatter = chat.HChat(args.nick, args.room)
-        try:
-            chatter.run()
-            threading.Thread(target=getUserInput(args.nick,chatter)).start()
-        except KeyboardInterrupt:
-            chatter.ws.abort()
-            chatter.ws.close()
-            print("\nChat exited")
-            exit(0)
+        ccurses = wrapper(interface.interface)
+        ccurses.nickname = args.nick
+        ccurses.channel = args.room
+        ccurses.setup()
+        threading.Thread(target=ccurses.getMessages).start()
+        while True:
+            try:
+                ccurses.run()
+            except KeyboardInterrupt:
+                ccurses.destruct()
+                ccurses.chatter.ws.abort()
+                ccurses.chatter.ws.close()
+                exit(0)
 
 
 main()

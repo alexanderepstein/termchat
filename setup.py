@@ -3,6 +3,13 @@
 
 import os
 
+try:
+    import websocket
+    getattr(websocket, 'create_connection')
+except AttributeError:
+    print("Error: you must uninstall websocket to use websocket-client due to naming conflicts")
+
+
 from setuptools import find_packages, setup
 
 # Package meta-data.
@@ -16,7 +23,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 long_description = "For information on this package refer to the github: https://github.com/alexanderepstein/tchat"
 # What packages are required for this module to be executed?
 required = [
-     'websocket-client', 'websocket'
+     'websocket-client'
 ]
 
 # Dependencies only for versions less than Python 2.7:
@@ -34,7 +41,7 @@ setup(
     url=URL,
     packages=find_packages(exclude=('tests',)),
     entry_points={
-        'console_scripts': ['tchat=driver.driver:main'],
+        'console_scripts': ['tchat=tchatDriver.driver:main'],
     },
     keywords = ['terminal', 'chat', 'client', 'console'], # arbitrary keywords
     install_requires=required,

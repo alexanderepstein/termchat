@@ -4,4 +4,3 @@ verify_ssl = true
 
 [packages]
 websocket-client = "*"
-websocket = "*"

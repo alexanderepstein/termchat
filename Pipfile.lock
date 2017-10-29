@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0b134acda0b46854d942876b3004bc763a1d92aa4f5a30b4689a2908b3f03cf5"
+            "sha256": "898eb10d31c85e5821d95848caef1aa27742ac53c5ccb42ea8edc5be3eb276cb"
         },
         "requires": {},
         "sources": [
@@ -12,17 +12,8 @@
         ]
     },
     "default": {
-        "gevent": {
-            "version": "==1.2.2"
-        },
-        "greenlet": {
-            "version": "==0.4.12"
-        },
         "six": {
             "version": "==1.11.0"
-        },
-        "websocket": {
-            "version": "==0.2.1"
         },
         "websocket-client": {
             "version": "==0.44.0"

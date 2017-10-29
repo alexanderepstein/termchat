@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-echo -n "Packaging cryptowatch into wheel.."
+echo -n "Packaging tchat into wheel.."
 version=$(cat __version__.py | grep -Eo "[0-9.]*" | grep -v "^[.]")
 python3 setup.py bdist_wheel --python-tag=py3 > /dev/null || echo "Failure!" &
 
