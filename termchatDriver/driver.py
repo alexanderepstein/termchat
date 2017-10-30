@@ -27,7 +27,7 @@ import threading
 from curses import wrapper
 from termchatUtils import interface
 
-currentVersion="0.0.1"
+currentVersion="0.0.4"
 
 def getUser():
     import os

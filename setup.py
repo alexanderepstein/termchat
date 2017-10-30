@@ -10,7 +10,7 @@ DESCRIPTION = 'Chat through the terminal with hack.chat'
 URL = 'https://github.com/alexanderepstein/termchat'
 EMAIL = 'epsteina@wit.edu'
 AUTHOR = 'Alexander Epstein'
-VERSION = '0.0.1'
+VERSION = '0.0.4'
 here = os.path.abspath(os.path.dirname(__file__))
 long_description = "For information on this package refer to the github: " + URL
 # What packages are required for this module to be executed?
