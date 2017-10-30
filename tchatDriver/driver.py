@@ -26,7 +26,7 @@ import threading
 
 from curses import wrapper
 
-from tchat import interface
+from tchatUtils import interface
 
 
 

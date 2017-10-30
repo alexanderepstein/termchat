@@ -63,7 +63,6 @@ class interface(object):
         self.showing = 0
         self.selection = 0
         self.messageNumber = 0
-        self.leastMessageNumber = 2
         self.amountOfUsers = 1
 
     def setup(self):
@@ -163,7 +162,6 @@ class interface(object):
         Draws the chat frame
         """
         self.chat_max_y, self.chat_max_x = self.chat_win.getmaxyx()
-        self.body_win.noutrefresh()
         self.chat_win.box()
         self.chat_win.refresh()
 
@@ -264,6 +262,8 @@ class interface(object):
         """
         Sends the string in textarea and clear the window
         """
+        if self.text == "":
+            return
         self.chatter.send_message(self.text)
         self.char_pos = [1, 1]
         self.text = ""
@@ -275,46 +275,60 @@ class interface(object):
         write the given string at the correct position
         in the chatarea
         """
-
+        #prevent empty messages
+        if (chat == ""):
+            return
         # FIXME: fails when text goes beyond window limit
         if user == self.nickname:
             col = curses.color_pair(8)
         else:
             col = curses.color_pair(1)
 
-        self.chatarea.addstr(self.chat_at, 0, str(user) + ': ', col)
+        try:
+            self.chatarea.addstr(self.chat_at, 0, str(user) + ': ', col)
+                # write the actual chat content
+            self.chatarea.addstr(chat)
+        except Exception:
+            self.refreshChat()
 
-        # write the actual chat content
-        self.chatarea.addstr(chat)
 
+
+
+
+
+        self.chatarea.refresh()
         # update cursor
         self.chat_at, _ = self.chatarea.getyx()
         self.chat_at += 1
-        if self.chat_at > self.chatareaHeight:
-            self.messageNumber = self.leastMessageNumber
-            self.leastMessageNumber += 2
-        self.chatarea.refresh()
+
 
     def run(self):
         """
         Method to call inside the main loop that keeps the interface
         """
         while True:
-            self.refresh_body()
             c = self.body_win.getch()
             self.keypress(c)
 
+    def refreshChat(self):
+        self.chatarea.erase()
+        self.init_chatarea()
+        for i in range(2,0):
+            self.push_chat(self.chatter.user_message[self.messageNumber-i], self.chatter.on_message[self.messageNumber-i])
+        self.chatter.user_message = []
+        self.chatter.on_message = []
+        self.messageNumber = 0
 
     def getMessages(self):
         """
 
         """
         while self.chatter.ws.connected:
+            self.refresh_body()
             while len(self.chatter.on_message) > self.messageNumber:
-                self.push_chat(self.chatter.user_message[self.messageNumber], self.chatter.on_message[self.messageNumber])
-                self.messageNumber += 1
-                self.refresh_body()
-            sleep(20/1000)
+                    self.push_chat(self.chatter.user_message[self.messageNumber], self.chatter.on_message[self.messageNumber])
+                    self.messageNumber += 1
+            sleep(60/1000)
 
     def checkResize(self):
         """
@@ -330,7 +344,6 @@ class interface(object):
                     exit(1)
                 self.stdscr.clear()
                 self.setup_draw()
-                self.messageNumber = 0
             sleep(20/1000)
 
 
@@ -364,6 +377,9 @@ class interface(object):
 
         # send the content on the textbox
         elif char == curses.KEY_ENTER or chr(char) == "\n":
+            self.chatter.on_message.append(self.text)
+            self.chatter.user_message.append(self.nickname)
+            self.messageNumber += 1
             self.push_chat(self.nickname,self.text)
             self.send_text()
             return

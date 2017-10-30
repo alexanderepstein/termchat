@@ -24,8 +24,7 @@
 
 import json
 import threading
-from sys import stdout
-from time import time as pingTime
+from time import sleep
 
 try:
     import websocket
@@ -53,7 +52,6 @@ class HChat:
     def send_message(self, msg):
         """Sends a message on the channel."""
         self._send_packet({"cmd": "chat", "text": msg})
-        stdout.flush()
 
     def _send_packet(self, packet):
         """Sends <packet> (<dict>) to https://hack.chat."""
@@ -62,26 +60,20 @@ class HChat:
             self.ws.send(encoded)
 
     def run(self):
-        print("Connecting...", end = "")
         try:
             self.ws = websocket.create_connection("wss://hack.chat/chat-ws")
-            self.pingDelay = pingTime()
-            self.pingThread = threading.Thread(target=self.pingThread)
             self.chatThread = threading.Thread(target=self.chatThread)
             self._send_packet({"cmd": "join", "channel": self.channel, "nick": self.nick})
             self.chatThread.start()
-            self.pingThread.start()
-            print("Success!")
         except Exception as err:
-            print("Failure!")
             print(err)
             exit(1)
-
 
 
     def chatThread(self):
         while self.ws.connected:
             try:
+                self.sendPing()
                 result = json.loads(self.ws.recv())
             except  websocket._exceptions.WebSocketConnectionClosedException:
                 exit(0)
@@ -95,14 +87,8 @@ class HChat:
             elif result["cmd"] == "onlineSet":
                 for nick in result["nicks"]:
                     self.online_users.append(nick)
+            sleep(20/1000)
 
-    def pingThread(self):
+    def sendPing(self):
         """Retains the websocket connection."""
-        try:
-            while self.ws.connected:
-                tempTime = pingTime()
-                if tempTime - self.pingDelay >= 60:
-                    self.pingDelay = pingTime()
-                    self._send_packet({"cmd": "ping"})
-        except websocket._exceptions.WebSocketConnectionClosedException:
-            exit(1)
+        self._send_packet({"cmd": "ping"})
