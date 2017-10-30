@@ -1,26 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import os
-
-try:
-    import websocket
-    getattr(websocket, 'create_connection')
-except AttributeError:
-    print("Error: you must uninstall websocket to use websocket-client due to naming conflicts")
-
 
 from setuptools import find_packages, setup
 
 # Package meta-data.
-NAME = 'tchat'
+NAME = 'termchat'
 DESCRIPTION = 'Chat through the terminal with hack.chat'
-URL = 'https://github.com/alexanderepstein/tchat'
+URL = 'https://github.com/alexanderepstein/termchat'
 EMAIL = 'epsteina@wit.edu'
 AUTHOR = 'Alexander Epstein'
 VERSION = '0.0.1'
 here = os.path.abspath(os.path.dirname(__file__))
-long_description = "For information on this package refer to the github: https://github.com/alexanderepstein/tchat"
+long_description = "For information on this package refer to the github: " + URL
 # What packages are required for this module to be executed?
 required = [
      'websocket-client'
@@ -41,7 +33,7 @@ setup(
     url=URL,
     packages=find_packages(exclude=('tests',)),
     entry_points={
-        'console_scripts': ['tchat=tchatDriver.driver:main'],
+        'console_scripts': ['termchat=termchatDriver.driver:main'],
     },
     keywords = ['terminal', 'chat', 'client', 'console'], # arbitrary keywords
     install_requires=required,

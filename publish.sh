@@ -21,11 +21,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-echo -n "Packaging tchat into wheel.."
+echo -n "Packaging termchat into wheel.."
 version=$(cat __version__.py | grep -Eo "[0-9.]*" | grep -v "^[.]")
 python3 setup.py bdist_wheel --python-tag=py3 > /dev/null || echo "Failure!" &
 
-while [ ! -f dist/tchat-$version-py3-none-any.whl ];do
+while [ ! -f dist/termchat-$version-py3-none-any.whl ];do
   echo -n "."
   sleep .5
 done
@@ -33,5 +33,5 @@ echo -e "Success!\n"
 
 
 echo -n "Uploading wheel to PyPi..."
-twine upload dist/tchat-$version-py3-none-any.whl > /dev/null || echo "Failure!"
+twine upload dist/termchat-$version-py3-none-any.whl > /dev/null || { echo "Failure!"; exit 1;}
 echo "Success!"

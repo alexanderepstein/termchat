@@ -28,7 +28,7 @@ import threading
 
 from time import sleep
 
-from tchatUtils.HChat import HChat as chat
+from termchatUtils.HChat import HChat as chat
 
 
 

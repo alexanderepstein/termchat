@@ -25,10 +25,7 @@ import argparse
 import threading
 
 from curses import wrapper
-
-from tchatUtils import interface
-
-
+from termchatUtils import interface
 
 currentVersion="0.0.1"
 
@@ -38,7 +35,7 @@ def getUser():
     return pwd.getpwuid(os.getuid())[0]
 
 def parseArgs():
-    parser = argparse.ArgumentParser(prog="tchat", description='Chat through the terminal with hack.chat', epilog="By: Alex Epstein https://github.com/alexanderepstein")
+    parser = argparse.ArgumentParser(prog="termchat", description='Chat through the terminal with hack.chat', epilog="By: Alex Epstein https://github.com/alexanderepstein")
     parser.add_argument("-r", "--room", default="", help="Choose the name of the chatroom to enter")
     parser.add_argument("-n", "--nick", default=getUser(), help="Set the username for others to see")
     parser.add_argument("-v", "--version", action="store_true", help="Display the current version of tchat")
@@ -48,11 +45,10 @@ def parseArgs():
 
 def main():
     args = parseArgs()
-    if args.version and not (args.curses or args.room or args.nick):
+    if args.version:
         print(currentVersion)
     elif args.room == "":
         print("You must specify a room name to join")
-        exit(1)
     else:
         ccurses = wrapper(interface.interface)
         ccurses.nickname = args.nick
@@ -67,6 +63,8 @@ def main():
                 ccurses.chatter.ws.abort()
                 ccurses.chatter.ws.close()
                 exit(0)
-
-
-main()
+            except Exception:
+                ccurses.destruct()
+                ccurses.chatter.ws.abort()
+                ccurses.chatter.ws.close()
+                exit(1)
