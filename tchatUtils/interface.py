@@ -143,7 +143,7 @@ class interface(object):
 
 
     def init_head(self):
-        name = self.channel
+        name = "Channel: " + self.channel
         middle_pos = int(self.maxX/2 - len(name)/2)
         self.head_win.addstr(0, middle_pos, name, curses.color_pair(2))
         self.head_win.bkgd(' ', curses.color_pair(7))
@@ -262,8 +262,6 @@ class interface(object):
         """
         Sends the string in textarea and clear the window
         """
-        if self.text == "":
-            return
         self.chatter.send_message(self.text)
         self.char_pos = [1, 1]
         self.text = ""
@@ -275,10 +273,6 @@ class interface(object):
         write the given string at the correct position
         in the chatarea
         """
-        #prevent empty messages
-        if (chat == ""):
-            return
-        # FIXME: fails when text goes beyond window limit
         if user == self.nickname:
             col = curses.color_pair(8)
         else:
@@ -288,18 +282,14 @@ class interface(object):
             self.chatarea.addstr(self.chat_at, 0, str(user) + ': ', col)
                 # write the actual chat content
             self.chatarea.addstr(chat)
+            self.chatarea.refresh()
+            # update cursor
+            self.chat_at, _ = self.chatarea.getyx()
+            self.chat_at += 1
         except Exception:
             self.refreshChat()
 
 
-
-
-
-
-        self.chatarea.refresh()
-        # update cursor
-        self.chat_at, _ = self.chatarea.getyx()
-        self.chat_at += 1
 
 
     def run(self):
@@ -312,12 +302,16 @@ class interface(object):
 
     def refreshChat(self):
         self.chatarea.erase()
-        self.init_chatarea()
-        for i in range(2,0):
+        self.chat_at = 0
+        self.chatarea.refresh()
+        self.messageNumber -= 3
+        # the latter didn't produce the intended behavior (need to find a way to minimize the size of the array)
+        """for i in range(2,0):
             self.push_chat(self.chatter.user_message[self.messageNumber-i], self.chatter.on_message[self.messageNumber-i])
         self.chatter.user_message = []
         self.chatter.on_message = []
         self.messageNumber = 0
+        """
 
     def getMessages(self):
         """
@@ -333,6 +327,7 @@ class interface(object):
     def checkResize(self):
         """
         Determine if the terminal has been resized and redraws the interface
+        Fix this
         """
         while self.chatter.ws.connected:
             tempHeight, tempWidth = self.stdscr.getmaxyx()
@@ -344,7 +339,6 @@ class interface(object):
                     exit(1)
                 self.stdscr.clear()
                 self.setup_draw()
-            sleep(20/1000)
 
 
     def destruct(self):
@@ -377,12 +371,18 @@ class interface(object):
 
         # send the content on the textbox
         elif char == curses.KEY_ENTER or chr(char) == "\n":
-            self.chatter.on_message.append(self.text)
-            self.chatter.user_message.append(self.nickname)
-            self.messageNumber += 1
-            self.push_chat(self.nickname,self.text)
-            self.send_text()
-            return
+            if (self.text.replace(" ", "") != ""):
+                self.chatter.on_message.append(self.text)
+                self.chatter.user_message.append(self.nickname)
+                self.messageNumber += 1
+                self.push_chat(self.nickname,self.text)
+                self.send_text()
+                return
+            else:
+                self.char_pos = [1, 1]
+                self.text = ""
+                self.textarea.clear()
+                self.refresh_textarea()
 
         # delete a character
         elif chr(char) == self.del_char or chr(char) == "ć":
