@@ -384,8 +384,8 @@ class interface(object):
                 self.textarea.clear()
                 self.refresh_textarea()
 
-        # delete a character
-        elif chr(char) == self.del_char or chr(char) == "ć":
+        # delete a character (windows, gnu linux, mac)
+        elif chr(char) == self.del_char or chr(char) == "ć" or chr(char) == "\x7f":
             self.backspace()
             return
 
