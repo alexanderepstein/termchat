@@ -23,7 +23,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -r ROOM, --room ROOM  Choose the name of the chatroom to enter
   -n NICK, --nick NICK  Set the username for others to see
-  -v, --version         Display the current version of tchat
+  -v, --version         Display the current version of termchat
 ```
 
 ## Install
