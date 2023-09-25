@@ -1,4 +1,4 @@
-gevent==1.2.2
+gevent==23.9.1
 greenlet==0.4.12
 six==1.11.0
 websocket-client==0.44.0
